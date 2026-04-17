@@ -4,6 +4,10 @@
 
 一个一直飘在屏幕角落的小窗口，提醒你今天该做什么。写进去、做完了、划掉，一天就有了形状。
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="今天没白活 app screenshot" width="420">
+</p>
+
 ## 核心特性
 
 - 🪟 **置顶浮动** — 始终在所有窗口之上，随时看得到
