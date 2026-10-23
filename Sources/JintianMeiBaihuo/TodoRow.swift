@@ -42,6 +42,7 @@ struct TodoRow: View {
                         .font(PixelTheme.small()).foregroundColor(PixelTheme.text)
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
             if let onDetails {
                 Button("···", action: onDetails).buttonStyle(.plain).help("分类与提醒")

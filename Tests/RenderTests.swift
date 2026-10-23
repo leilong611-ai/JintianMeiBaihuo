@@ -20,6 +20,7 @@ struct RenderTests {
             store.fontSize = font
             let view = ContentView(showSettings: settings, showHistory: history).environmentObject(store).environmentObject(ReminderService())
             let host = NSHostingView(rootView: view)
+            host.appearance = NSAppearance(named: .darkAqua)
             host.frame = NSRect(x: 0, y: 0, width: width, height: height)
             host.layoutSubtreeIfNeeded()
             guard let bitmap = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { fatalError("No bitmap") }

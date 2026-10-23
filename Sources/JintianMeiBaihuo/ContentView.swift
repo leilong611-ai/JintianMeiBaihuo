@@ -41,23 +41,26 @@ struct ContentView: View {
                 HStack {
                     Button(showHistory ? "返回待办" : "历史回顾") { showHistory.toggle() }
                         .keyboardShortcut("h", modifiers: [.command, .shift])
-                    Picker("分类", selection: $filter) {
-                        Text("全部").tag("全部")
-                        Text("未分类").tag("未分类")
-                        ForEach(store.categories.filter { $0 != "全部" && $0 != "未分类" }, id: \.self) { Text($0).tag($0) }
-                    }.labelsHidden()
-                    TextField("搜索", text: $search).textFieldStyle(.plain)
+                    Menu {
+                        Button("全部") { filter = "全部" }
+                        Button("未分类") { filter = "未分类" }
+                        ForEach(store.categories.filter { $0 != "全部" && $0 != "未分类" }, id: \.self) { category in
+                            Button(category) { filter = category }
+                        }
+                    } label: { Text(filter + " ▾").foregroundColor(PixelTheme.text) }
+                    .menuStyle(.borderlessButton).fixedSize()
+                    TextField("搜索", text: $search, prompt: Text("搜索").foregroundColor(PixelTheme.muted)).textFieldStyle(.plain)
                 }.font(PixelTheme.small()).padding(.horizontal, 16).padding(.vertical, 8)
                 if !showHistory {
                     HStack(spacing: 8) {
                         Text("▸").foregroundColor(PixelTheme.accent)
-                        TextField("写下一件要做的事…", text: $newTodoText)
+                        TextField("写下一件要做的事…", text: $newTodoText, prompt: Text("写下一件要做的事…").foregroundColor(PixelTheme.muted))
                             .textFieldStyle(.plain).focused($inputFocused).onSubmit(addTodo)
                         Button("+", action: addTodo).help("添加 (Enter)")
                     }.font(.system(size: store.fontSize, weight: .heavy, design: .monospaced)).padding(16)
                     HStack {
                         Text("新任务分类").foregroundColor(PixelTheme.muted)
-                        TextField("可选，例如工作 / 生活", text: $newCategory).textFieldStyle(.plain)
+                        TextField("可选，例如工作 / 生活", text: $newCategory, prompt: Text("可选，例如工作 / 生活").foregroundColor(PixelTheme.muted)).textFieldStyle(.plain)
                     }.font(PixelTheme.small()).padding(.horizontal, 16).padding(.bottom, 8)
                 }
                 PixelDivider()
@@ -67,13 +70,13 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
-                        LazyVStack(spacing: 4) {
+                        VStack(spacing: 4) {
                             ForEach(visibleItems) { todo in
                                 if showHistory {
                                     VStack(alignment: .leading, spacing: 8) {
                                         Text(todo.text).font(.system(size: store.fontSize, weight: .heavy, design: .monospaced))
                                         HStack {
-                                            Text("归档：" + (todo.archivedAt?.formatted(date: .abbreviated, time: .omitted) ?? ""))
+                                            Text("归档：" + (todo.archivedAt?.formatted(.dateTime.year().month().day().locale(Locale(identifier: "zh_CN"))) ?? ""))
                                             Spacer()
                                             Button("恢复为待办") { store.restore(todo.id) }
                                         }.font(PixelTheme.small())
@@ -118,6 +121,7 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .environment(\.colorScheme, .dark)
         .environment(\.locale, Locale(identifier: "zh_CN"))
         .foregroundColor(PixelTheme.text)
         .buttonStyle(.plain)
