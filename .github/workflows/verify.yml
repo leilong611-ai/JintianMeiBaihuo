@@ -1,0 +1,33 @@
+name: macOS verification
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: macos-14
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build app
+        run: bash build.sh
+      - name: Test persistence and migration
+        run: |
+          swiftc -parse-as-library Sources/JintianMeiBaihuo/Todo.swift Sources/JintianMeiBaihuo/TodoStore.swift Tests/StoreTests.swift -o build/store-tests
+          build/store-tests
+      - name: Test window placement
+        run: |
+          swiftc -parse-as-library Sources/JintianMeiBaihuo/WindowPlacement.swift Tests/WindowPlacementTests.swift -o build/window-tests
+          build/window-tests
+      - name: Render synthetic-data previews
+        run: |
+          swiftc -parse-as-library Sources/JintianMeiBaihuo/{Todo,TodoStore,ReminderService,PixelTheme,PixelCheckbox,TodoRow,ContentView}.swift Tests/RenderTests.swift -o build/render-tests
+          build/render-tests
+      - name: Package candidate
+        run: ditto -c -k --sequesterRsrc --keepParent 'build/今天没白活.app' build/JintianMeiBaihuo-beta.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macOS-candidate
+          path: |
+            build/JintianMeiBaihuo-beta.zip
+            build/preview-*.png
+          retention-days: 14
