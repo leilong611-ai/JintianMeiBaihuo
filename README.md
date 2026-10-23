@@ -4,6 +4,14 @@
 
 一个一直飘在屏幕角落的小窗口，提醒你今天该做什么。写进去、做完了、划掉，一天就有了形状。
 
+## 本仓库与来源
+
+这是 leilong611-ai 维护的独立续作，原作者为 [lijigang](https://github.com/lijigang)，保留原 MIT 许可证及版权声明，不代表原作者官方发布。
+
+2026-10-23 核对时，原仓库 `lijigang/JintianMeiBaihuo` 公开访问返回 404。本基线从公开副本 [yanhao2046/JintianMeiBaihuo](https://github.com/yanhao2046/JintianMeiBaihuo) 恢复；原始两次提交及全部对象已按 Git SHA 校验，基线为 `f71cfb989377471624df444be1d8609737c672dd`。不保证包含原仓库后续全部改动。截图属于原始基线。
+
+当前仓库只包含公开源码与项目素材，不包含使用者的待办、设置或登录资料。下一版计划：窗口与字号设置、快捷键、每日归档和历史回顾、任务分类及提醒。
+
 <p align="center">
   <img src="docs/screenshot.png" alt="今天没白活 app screenshot" width="420">
 </p>
@@ -27,9 +35,9 @@
 
 ## 安装
 
-### 方式一：下载 DMG（推荐）
+### 安装包状态
 
-到 [Releases](../../releases) 下载最新版 DMG，双击打开，把 `今天没白活.app` 拖进 Applications。
+本续作尚未发布安装包。下方为源码构建方式；原作者 v1.0.0 安装包未在此重新发布。
 
 > ⚠️ 未代码签名。首次启动会被 Gatekeeper 拦，解决办法：**右键点 app 图标 → 选「打开」→ 弹窗里再点一次「打开」**。之后正常双击即可。
 
@@ -38,7 +46,7 @@
 需要 macOS 13+ 和 Xcode Command Line Tools。
 
 ```bash
-git clone https://github.com/lijigang/JintianMeiBaihuo.git
+git clone https://github.com/leilong611-ai/JintianMeiBaihuo.git
 cd JintianMeiBaihuo
 ./build.sh
 open "build/今天没白活.app"
