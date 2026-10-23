@@ -10,7 +10,7 @@
 
 2026-10-23 核对时，原仓库 `lijigang/JintianMeiBaihuo` 公开访问返回 404。本基线从公开副本 [yanhao2046/JintianMeiBaihuo](https://github.com/yanhao2046/JintianMeiBaihuo) 恢复；原始两次提交及全部对象已按 Git SHA 校验，基线为 `f71cfb989377471624df444be1d8609737c672dd`。不保证包含原仓库后续全部改动。截图属于原始基线。
 
-当前仓库只包含公开源码与项目素材，不包含使用者的待办、设置或登录资料。下一版计划：窗口与字号设置、快捷键、每日归档和历史回顾、任务分类及提醒。
+当前仓库只包含公开源码与项目素材，不包含使用者的待办、设置或登录资料。1.1 候选已加入窗口与字号设置、快捷键、每日归档和历史回顾、任务分类及提醒。详见 [更新说明](docs/CHANGELOG.md)。候选构建和测试状态见 [Actions](https://github.com/leilong611-ai/JintianMeiBaihuo/actions)。
 
 <p align="center">
   <img src="docs/screenshot.png" alt="今天没白活 app screenshot" width="420">
@@ -23,7 +23,7 @@
 - 👻 **透明度可调** — 30%–100% 自由调，不挡事
 - 🕹️ **像素风视觉** — 6 色复古调色板 + 重字重等宽字体 + 零圆角零阴影零动画
 - 🔠 **大字体** — 默认 20pt，一眼看清
-- 💾 **本地持久化** — 写到 `~/Library/Application Support/JintianMeiBaihuo/todos.json`，不联网
+- 💾 **本地持久化** — 续作写到 `~/Library/Application Support/JintianMeiBaihuoCommunity/todos-v2.json`，不联网；首次启动只读导入旧版并保留原始备份
 
 ## 使用
 

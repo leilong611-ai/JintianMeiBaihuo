@@ -5,6 +5,8 @@ struct TodoRow: View {
     let onToggle: () -> Void
     let onUpdate: (String) -> Void
     let onDelete: () -> Void
+    var fontSize: Double = 20
+    var onDetails: (() -> Void)? = nil
 
     @State private var isEditing = false
     @State private var draft = ""
@@ -17,7 +19,7 @@ struct TodoRow: View {
             if isEditing {
                 TextField("", text: $draft)
                     .textFieldStyle(.plain)
-                    .font(PixelTheme.body())
+                    .font(.system(size: fontSize, weight: .heavy, design: .monospaced))
                     .foregroundColor(PixelTheme.text)
                     .focused($editFocused)
                     .onSubmit {
@@ -30,8 +32,8 @@ struct TodoRow: View {
                         editFocused = true
                     }
             } else {
-                Text(todo.text)
-                    .font(PixelTheme.body())
+                Text(todo.text + (todo.category.map { "  [\($0)]" } ?? "") + (todo.reminderAt.map { "  ◷ " + $0.formatted(date: .abbreviated, time: .shortened) } ?? ""))
+                    .font(.system(size: fontSize, weight: .heavy, design: .monospaced))
                     .foregroundColor(todo.completed ? PixelTheme.muted : PixelTheme.text)
                     .strikethrough(todo.completed, color: PixelTheme.muted)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -43,6 +45,10 @@ struct TodoRow: View {
             }
 
             Spacer(minLength: 0)
+
+            if let onDetails {
+                Button("···", action: onDetails).buttonStyle(.plain).help("分类与提醒")
+            }
 
             Button(action: onDelete) {
                 Text("×")

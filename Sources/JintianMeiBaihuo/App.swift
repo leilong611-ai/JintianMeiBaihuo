@@ -5,15 +5,20 @@ import AppKit
 struct JintianMeiBaihuoApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var store = TodoStore()
+    @StateObject private var reminders = ReminderService()
 
     var body: some Scene {
         WindowGroup("今天没白活") {
             ContentView()
                 .environmentObject(store)
+                .environmentObject(reminders)
                 .frame(minWidth: 320, minHeight: 400)
                 .onAppear {
-                    appDelegate.configureWindow(alpha: store.windowAlpha)
+                    appDelegate.configureWindow(alpha: store.windowAlpha, onTop: store.alwaysOnTop)
+                    store.onChange = { reminders.sync($0) }
+                    reminders.sync(store.allItems)
                 }
+                .onChange(of: store.alwaysOnTop) { appDelegate.updateLevel($0) }
                 .onChange(of: store.windowAlpha) { newValue in
                     appDelegate.updateAlpha(newValue)
                 }
@@ -34,7 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    func configureWindow(alpha: Double) {
+    func configureWindow(alpha: Double, onTop: Bool) {
         DispatchQueue.main.async { [weak self] in
             // Idempotent: onAppear fires repeatedly on view updates
             if self?.mainWindow != nil {
@@ -43,7 +48,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             guard let window = NSApp.mainWindow ?? NSApp.windows.first else { return }
 
-            window.level = .floating
+            window.level = onTop ? .floating : .normal
             window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
 
             window.isOpaque = false
@@ -61,11 +66,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let primary = NSScreen.screens.first(where: { $0.frame.origin == .zero })
                 ?? NSScreen.screens.first
                 ?? NSScreen.main
-            if let screen = primary {
+            let restored = window.setFrameUsingName("TodoCommunityMainWindow")
+            if !restored, let screen = primary {
                 let visible = screen.visibleFrame
                 let x = visible.maxX - initialSize.width - 40
                 let y = visible.maxY - initialSize.height - 40
                 window.setFrameOrigin(NSPoint(x: x, y: y))
+            }
+
+            window.setFrameAutosaveName("TodoCommunityMainWindow")
+            // Keep a restored window reachable after a display is disconnected.
+            if !NSScreen.screens.contains(where: { $0.visibleFrame.intersects(window.frame) }), let screen = primary {
+                window.setFrameOrigin(NSPoint(x: screen.visibleFrame.minX + 40, y: screen.visibleFrame.maxY - window.frame.height - 40))
             }
 
             if let hostingView = window.contentView {
@@ -75,6 +87,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             self?.mainWindow = window
         }
+    }
+
+    func updateLevel(_ onTop: Bool) {
+        mainWindow?.level = onTop ? .floating : .normal
     }
 
     func updateAlpha(_ alpha: Double) {

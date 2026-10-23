@@ -25,6 +25,7 @@ SDK_PATH=$(xcrun --sdk macosx --show-sdk-path)
 SOURCES=(
     "$SRC_DIR/Todo.swift"
     "$SRC_DIR/TodoStore.swift"
+    "$SRC_DIR/ReminderService.swift"
     "$SRC_DIR/PixelTheme.swift"
     "$SRC_DIR/PixelCheckbox.swift"
     "$SRC_DIR/TodoRow.swift"
@@ -40,6 +41,7 @@ xcrun swiftc \
     -framework SwiftUI \
     -framework Foundation \
     -framework Combine \
+    -framework UserNotifications \
     -o "$BIN_OUT" \
     "${SOURCES[@]}"
 
