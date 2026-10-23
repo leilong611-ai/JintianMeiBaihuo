@@ -15,6 +15,11 @@ struct ContentView: View {
     @FocusState private var inputFocused: Bool
     private let clock = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
+    init(showSettings: Bool = false, showHistory: Bool = false) {
+        _showSettings = State(initialValue: showSettings)
+        _showHistory = State(initialValue: showHistory)
+    }
+
     private var visibleItems: [Todo] {
         (showHistory ? store.history : store.items).filter {
             (filter == "全部" || ($0.category ?? "未分类") == filter) &&
@@ -112,6 +117,8 @@ struct ContentView: View {
                 }
             }
         }
+        .preferredColorScheme(.dark)
+        .environment(\.locale, Locale(identifier: "zh_CN"))
         .foregroundColor(PixelTheme.text)
         .buttonStyle(.plain)
         .transaction { $0.animation = nil }
