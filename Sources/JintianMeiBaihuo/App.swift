@@ -66,6 +66,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             window.isMovableByWindowBackground = true
 
+            // SwiftUI assigns its own autosave name; it otherwise restores stale geometry
+            // after our initial frame is applied. This window uses one explicit frame store.
+            window.setFrameAutosaveName("")
+            window.isRestorable = false
             window.minSize = NSSize(width: 320, height: 400)
             let screens = NSScreen.screens.map(\.visibleFrame)
             let primary = NSScreen.screens.first(where: { $0.frame.origin == .zero })
