@@ -156,6 +156,7 @@ private struct TaskDetails: View {
     @State private var category = ""
     @State private var enabled = false
     @State private var date = Date().addingTimeInterval(3600)
+    private var reminderDate: Date { Calendar.current.dateInterval(of: .minute, for: date)?.start ?? date }
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("分类与提醒").font(.headline)
@@ -163,15 +164,15 @@ private struct TaskDetails: View {
             Toggle("设置提醒", isOn: $enabled)
             if enabled {
                 DatePicker("提醒时间", selection: $date, displayedComponents: [.date, .hourAndMinute])
-                if date <= Date() { Text("请选择未来时间").foregroundColor(.red) }
+                if reminderDate <= Date() { Text("请选择未来时间").foregroundColor(.red) }
                 if todo.completed { Text("已完成任务不会触发提醒").foregroundColor(.secondary) }
             }
             Text("保存提醒时间后，请在设置中启用通知。").font(.caption)
             HStack {
                 Button("取消") { dismiss() }.keyboardShortcut(.cancelAction)
                 Spacer()
-                Button("保存") { save(category, enabled ? date : nil); dismiss() }
-                    .disabled(enabled && date <= Date()).keyboardShortcut(.defaultAction)
+                Button("保存") { save(category, enabled ? reminderDate : nil); dismiss() }
+                    .disabled(enabled && reminderDate <= Date()).keyboardShortcut(.defaultAction)
             }
         }.padding(24).frame(width: 360)
         .onAppear { category = todo.category ?? ""; enabled = todo.reminderAt != nil; date = todo.reminderAt ?? Date().addingTimeInterval(3600) }

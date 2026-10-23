@@ -30,6 +30,7 @@ SOURCES=(
     "$SRC_DIR/PixelCheckbox.swift"
     "$SRC_DIR/TodoRow.swift"
     "$SRC_DIR/ContentView.swift"
+    "$SRC_DIR/WindowPlacement.swift"
     "$SRC_DIR/App.swift"
 )
 
@@ -55,6 +56,11 @@ chmod +x "$APP_BUNDLE/Contents/MacOS/$APP_NAME_INTERNAL"
 cp "$PROJECT_DIR/Resources/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
 
 printf 'APPL????' > "$APP_BUNDLE/Contents/PkgInfo"
+
+# Bind the actual bundle identifier and Info.plist for local notification authorization.
+BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$APP_BUNDLE/Contents/Info.plist")
+codesign --force --sign - --identifier "$BUNDLE_ID" "$APP_BUNDLE"
+codesign --verify --strict "$APP_BUNDLE"
 
 echo ""
 echo "✓ 构建完成: $APP_BUNDLE"

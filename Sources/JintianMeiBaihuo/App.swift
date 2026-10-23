@@ -30,6 +30,14 @@ struct JintianMeiBaihuoApp: App {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private weak var mainWindow: NSWindow?
+    private var windowObservers: [NSObjectProtocol] = []
+
+    private func saveWindowFrame() {
+        guard let window = mainWindow, !window.isMiniaturized else { return }
+        UserDefaults.standard.set(NSStringFromRect(window.frame), forKey: "communityWindowFrame")
+    }
+
+    func applicationWillTerminate(_ notification: Notification) { saveWindowFrame() }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -58,27 +66,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             window.isMovableByWindowBackground = true
 
-            let initialSize = NSSize(width: 380, height: 520)
-            window.setContentSize(initialSize)
             window.minSize = NSSize(width: 320, height: 400)
-
-            // Pick primary screen (menu bar screen) — NSScreen.main varies with focus
+            let screens = NSScreen.screens.map(\.visibleFrame)
             let primary = NSScreen.screens.first(where: { $0.frame.origin == .zero })
                 ?? NSScreen.screens.first
-                ?? NSScreen.main
-            let restored = window.setFrameUsingName("TodoCommunityMainWindow")
-            if !restored, let screen = primary {
-                let visible = screen.visibleFrame
-                let x = visible.maxX - initialSize.width - 40
-                let y = visible.maxY - initialSize.height - 40
-                window.setFrameOrigin(NSPoint(x: x, y: y))
-            }
-
-            window.setFrameAutosaveName("TodoCommunityMainWindow")
-            // Keep a restored window reachable after a display is disconnected.
-            if !NSScreen.screens.contains(where: { $0.visibleFrame.intersects(window.frame) }), let screen = primary {
-                window.setFrameOrigin(NSPoint(x: screen.visibleFrame.minX + 40, y: screen.visibleFrame.maxY - window.frame.height - 40))
-            }
+            let saved = UserDefaults.standard.string(forKey: "communityWindowFrame").map(NSRectFromString)
+            let target = WindowPlacement.restoredFrame(saved, screens: screens, primary: primary?.visibleFrame)
+            window.setFrame(target, display: true)
 
             if let hostingView = window.contentView {
                 hostingView.wantsLayer = true
@@ -86,6 +80,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
 
             self?.mainWindow = window
+            for name in [NSWindow.didMoveNotification, NSWindow.didResizeNotification] {
+                let observer = NotificationCenter.default.addObserver(forName: name, object: window, queue: .main) { [weak self] _ in
+                    self?.saveWindowFrame()
+                }
+                self?.windowObservers.append(observer)
+            }
+            self?.saveWindowFrame()
         }
     }
 
